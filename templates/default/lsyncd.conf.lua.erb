@@ -9,5 +9,11 @@ settings {
 }
 
 -- Hacky way of doing conf.d style configs
-package.path = "/etc/lsyncd/conf.d/?.lua;" .. package.path
-local f = io.popen("ls /etc/lsyncd/conf.d/*.lua|xargs -n1 basename|sed 's/.lua//'") for mod in f:lines() do require(mod) end
+local confdir = '<%= node['lsyncd']['conf_d'] %>/'
+local entries = readdir( confdir )
+
+for name, isdir in pairs( entries ) do
+    if not isdir then
+        dofile( confdir .. name )
+    end
+end
